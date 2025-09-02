@@ -1,0 +1,48 @@
+{
+  "name": "Unlimited Attendance System",
+  "short_name": "Attendance Pro",
+  "description": "Unlimited offline attendance tracking with permanent data storage - Online/Offline support",
+  "start_url": "/?source=pwa",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "categories": ["productivity", "business", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192' fill='%23667eea'%3E%3Crect width='192' height='192' fill='%23667eea' rx='20'/%3E%3Cpath fill='white' d='M48 64h96v8H48zm0 16h96v8H48zm0 16h96v8H48zm0 16h64v8H48z'/%3E%3Ccircle fill='white' cx='128' cy='112' r='12'/%3E%3Cpath fill='white' d='M122 106l4 4 8-8v16l-8-8-4 4z'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%23667eea'%3E%3Crect width='512' height='512' fill='%23667eea' rx='50'/%3E%3Cpath fill='white' d='M128 170h256v20H128zm0 40h256v20H128zm0 40h256v20H128zm0 40h170v20H128z'/%3E%3Ccircle fill='white' cx='340' cy='300' r='30'/%3E%3Cpath fill='white' d='M325 285l15 15 25-25v50l-25-25-15 15z'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Crect width='72' height='72' fill='%23667eea' rx='8'/%3E%3Cpath fill='white' d='M20 24h32v4H20zm0 8h32v4H20zm0 8h32v4H20zm0 8h20v4H20z'/%3E%3Ccircle fill='white' cx='48' cy='44' r='6'/%3E%3Cpath fill='white' d='M45 41l3 3 6-6v12l-6-6-3 3z'/%3E%3C/svg%3E",
+      "sizes": "72x72",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect width='400' height='800' fill='%23667eea'/%3E%3Crect x='20' y='100' width='360' height='600' fill='white' rx='15'/%3E%3Ctext x='200' y='150' text-anchor='middle' fill='%23667eea' font-size='24' font-weight='bold'%3EAttendance System%3C/text%3E%3Crect x='40' y='200' width='320' height='40' fill='%234CAF50' rx='20'/%3E%3Ctext x='200' y='225' text-anchor='middle' fill='white' font-size='16'%3ECheck In%3C/text%3E%3Crect x='40' y='260' width='320' height='40' fill='%23f44336' rx='20'/%3E%3Ctext x='200' y='285' text-anchor='middle' fill='white' font-size='16'%3ECheck Out%3C/text%3E%3C/svg%3E",
+      "sizes": "400x800",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "Main attendance interface"
+    }
+  ],
+  "related_applications": [],
+  "launch_handler": {
+    "client_mode": "navigate-new"
+  }
+}

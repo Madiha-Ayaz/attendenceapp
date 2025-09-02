@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlimited Offline Attendance System</title>
+    <link rel="manifest" href="./manifest.json">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Attendance System">
+    <meta name="msapplication-TileColor" content="#667eea">
+    
+    <!-- App Icons -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --warning-color: #FFD700;
+            --text-dark: #333;
+            --text-light: #666;
+            --background-light: #f8f9fa;
+            --border-color: #ddd;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .header {
+            text-align: center;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .current-time {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            font-weight: bold;
+        }
+
+        .current-date {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 10px auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-online {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .status-offline {
+            background: rgba(255, 152, 0, 0.2);
+            color: #FF9800;
+            border: 2px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group input, .input-group select {
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: clamp(14px, 2.5vw, 16px);
+            transition: all 0.3s ease;
+            width: 100%;
+            background: white;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 160px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-checkin {
+            background: linear-gradient(45deg, var(--success-color), #45a049);
+            color: white;
+        }
+
+        .btn-checkout {
+            background: linear-gradient(45deg, var(--error-color), #da190b);
+            color: white;
+        }
+
+        .btn-holiday {
+            background: linear-gradient(45deg, var(--warning-color), #FFAC33);
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            font-size: 12px;
+            min-width: auto;
+            border-radius: 6px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            animation: shine 1s ease-in-out;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            opacity: 0.9;
+        }
+
+        .download-section {
+            background: var(--background-light);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .download-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-download, .btn-pdf {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-pdf {
+            background: linear-gradient(45deg, #FF5722, #E64A19);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            min-width: 900px;
+            background: white;
+        }
+
+        .attendance-table th,
+        .attendance-table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: clamp(13px, 2vw, 14px);
+        }
+
+        .attendance-table th {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .attendance-table tbody tr:hover {
+            background: #f8f9ff;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        .holiday-row {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
+            font-weight: 600;
+        }
+
+        .checkin-row {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+        }
+
+        .checkout-row {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb) !important;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: 500;
+        }
+
+        .success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 2px solid #b8dabd;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 2px solid #f1b0b7;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+            font-size: clamp(16px, 3vw, 18px);
+        }
+
+        /* Install Prompt Styles */
+        .install-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            z-index: 9999;
+        }
+
+        .install-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .install-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            animation: modalAppear 0.3s ease forwards;
+        }
+
+        @keyframes modalAppear {
+            to { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .card { padding: 20px; margin-bottom: 15px; }
+            .form-group { grid-template-columns: 1fr; gap: 15px; }
+            .button-group { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 300px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .download-buttons { flex-direction: column; align-items: center; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .attendance-table th, .attendance-table td { padding: 10px 8px; }
+        }
+
+        /* Custom Scrollbar */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Pulse Animation for Status */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Install Prompt -->
+    <div id="installPrompt" class="install-prompt">
+        <div class="install-content">
+            <div class="install-icon">📱</div>
+            <h2>Install Attendance App</h2>
+            <p>Download this app for unlimited offline usage. Your data will be stored permanently on your device.</p>
+            <br>
+            <button class="btn btn-checkin" id="installButton">
+                ⬇️ Install App
+            </button>
+            <br><br>
+            <button class="btn" onclick="skipInstall()" style="background: #6c757d;">
+                ⏭️ Skip & Use Online
+            </button>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="appContainer" class="container">
+        <!-- Header Section -->
+        <div class="card header">
+            <h1>🏢 Unlimited Attendance System</h1>
+            <p>Online/Offline | Unlimited Entries | Permanent Storage</p>
+            <div class="current-time" id="currentTime">00:00:00</div>
+            <div class="current-date" id="currentDate"></div>
+            <div id="connectionStatus" class="status-indicator status-online pulse">
+                <span id="statusIcon">🌐</span>
+                <span id="statusText">Online - Ready for unlimited entries</span>
+            </div>
+        </div>
+
+        <!-- Employee Information -->
+        <div class="card">
+            <h2>👤 Employee Information</h2>
+            <div class="form-group">
+                <div class="input-group">
+                    <label for="employeeName">
+                        👨‍💼 Employee Name:
+                    </label>
+                    <input type="text" id="employeeName" placeholder="Enter your full name" autocomplete="name">
+                </div>
+                <div class="input-group">
+                    <label for="employeeId">
+                        🆔 Employee ID:
+                    </label>
+                    <input type="text" id="employeeId" placeholder="Enter your employee ID" autocomplete="username">
+                </div>
+            </div>
+        </div>
+
+        <!-- Location Information -->
+        <div class="card">
+            <h2>📍 Location Information</h2>
+            <div class="form-group">
+                <div class="input-group">
+                    <label for="checkInLocation">
+                        📥 Check-in Location:
+                    </label>
+                    <input type="text" id="checkInLocation" placeholder="Enter check-in location" list="locations">
+                    <datalist id="locations">
+                        <option value="Office - Main Building">
+                        <option value="Office - Branch">
+                        <option value="Home Office">
+                        <option value="Client Site">
+                        <option value="Co-working Space">
+                    </datalist>
+                </div>
+                <div class="input-group">
+                    <label for="checkOutLocation">
+                        📤 Check-out Location:
+                    </label>
+                    <input type="text" id="checkOutLocation" placeholder="Enter check-out location" list="locations">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card">
+            <h2>⚡ Quick Actions</h2>
+            <p>Make unlimited entries - online or offline, anytime, anywhere!</p>
+            <div class="button-group">
+                <button class="btn btn-checkin" onclick="checkIn()">
+                    📥 Check In Now
+                </button>
+                <button class="btn btn-checkout" onclick="checkOut()">
+                    📤 Check Out Now
+                </button>
+                <button class="btn btn-holiday" onclick="markAsHoliday()">
+                    🎉 Mark Holiday
+                </button>
+            </div>
+            <div id="statusMessage"></div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-number" id="totalEntries">0</div>
+                <div class="stat-label">Total Entries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-number" id="completeSessions">0</div>
+                <div class="stat-label">Complete Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-number" id="totalHours">0</div>
+                <div class="stat-label">Total Hours</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎉</div>
+                <div class="stat-number" id="totalHolidays">0</div>
+                <div class="stat-label">Holidays</div>
+            </div>
+        </div>
+
+        <!-- Download Reports -->
+        <div class="card">
+            <div class="download-section">
+                <div class="download-header">
+                    <h3>📊 Download Reports</h3>
+                    <p>Export your attendance data for PC/Mobile with complete details</p>
+                </div>
+                <div class="download-buttons">
+                    <button class="btn-download" onclick="downloadCSVReport()">
+                        📊 Download CSV
+                    </button>
+                    <button class="btn-pdf" onclick="downloadPDFReport()">
+                        📄 Download PDF
+                    </button>
+                    <button class="btn btn-delete" onclick="deleteAllData()">
+                        🗑️ Clear All Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Records Table -->
+        <div class="card">
+            <h3>📋 All Attendance Records</h3>
+            <p>Complete history of all your entries with locations and durations</p>
+            <div class="table-container">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>📅 Date & Time</th>
+                            <th>📍 Type</th>
+                            <th>🏢 Location</th>
+                            <th>👤 Employee</th>
+                            <th>⏱️ Duration</th>
+                            <th>🎉 Holiday</th>
+                            <th>⚡ Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div id="noDataMessage" class="no-data" style="display: none;">
+                📋 No attendance records yet. Start by checking in!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let attendanceData = [];
+        let savedHolidays = [];
+        let isOnline = navigator.onLine;
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            loadData();
+            updateDisplay();
+            updateConnectionStatus();
+            checkInstallPrompt();
+        });
+
+        function initializeApp() {
+            // Register service worker when deployed
+            if ('serviceWorker' in navigator && location.protocol === 'https:') {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed'));
+            }
+        }
+
+        // PWA Installation
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').style.display = 'flex';
+        });
+
+        document.getElementById('installButton').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('Install outcome:', outcome);
+                deferredPrompt = null;
+            }
+            document.getElementById('installPrompt').style.display = 'none';
+        });
+
+        function skipInstall() {
+            document.getElementById('installPrompt').style.display = 'none';
+        }
+
+        function checkInstallPrompt() {
+            // Hide install prompt if already installed
+            if (window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true) {
+                document.getElementById('installPrompt').style.display = 'none';
+            }
+        }
+
+        // Time and Date Functions
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                now.toLocaleTimeString('en-US', { 
+                    hour12: true, 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+        }
+
+        // Connection Status
+        function updateConnectionStatus() {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            const statusDiv = document.getElementById('connectionStatus');
+
+            if (isOnline) {
+                statusIcon.textContent = '🌐';
+                statusText.textContent = 'Online - Ready for unlimited entries';
+                statusDiv.className = 'status-indicator status-online pulse';
+            } else {
+                statusIcon.textContent = '📱';
+                statusText.textContent = 'Offline Mode - Data saved locally';
+                statusDiv.className = 'status-indicator status-offline pulse';
+            }
+        }
+
+        window.addEventListener('online', () => {
+            isOnline = true;
+            updateConnectionStatus();
+        });
+
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            updateConnectionStatus();
+        });
+
+        // Data Management Functions
+        function loadData() {
+            try {
+                const savedAttendance = localStorage.getItem('unlimitedAttendanceData');
+                if (savedAttendance) {
+                    attendanceData = JSON.parse(savedAttendance);
+                }
+
+                const holidays = localStorage.getItem('savedHolidays');
+                if (holidays) {
+                    savedHolidays = JSON.parse(holidays);
+                }
+
+                // Load form data
+                const formFields = ['employeeName', 'employeeId', 'checkInLocation', 'checkOutLocation'];
+                formFields.forEach(field => {
+                    const saved = localStorage.getItem(field);
+                    if (saved) {
+                        document.getElementById(field).value = saved;
+                    }
+                });
+
+                console.log(`Loaded ${attendanceData.length} attendance records`);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showMessage('Error loading saved data', 'error');
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('unlimitedAttendanceData', JSON.stringify(attendanceData));
+                localStorage.setItem('savedHolidays', JSON.stringify(savedHolidays));
+
+                // Save form data
+                const formFields = ['employeeName', 'employeeId', 'checkInLocation', 'checkOutLocation'];
+                formFields.forEach(field => {
+                    localStorage.setItem(field, document.getElementById(field).value);
+                });
+
+                // Also save to IndexedDB for extra persistence
+                saveToIndexedDB();
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showMessage('Error saving data', 'error');
+            }
+        }
+
+        function saveToIndexedDB() {
+            const request = indexedDB.open('UnlimitedAttendanceDB', 1);
+
+            request.onupgradeneeded = function(event) {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('attendance')) {
+                    db.createObjectStore('attendance', { keyPath: 'id' });
+                }
+            };
+
+            request.onsuccess = function(event) {
+                const db = event.target.result;
+                const transaction = db.transaction(['attendance'], 'readwrite');
+                const store = transaction.objectStore('attendance');
+                store.put({
+                    id: 'unlimitedData',
+                    attendanceData: attendanceData,
+                    holidays: savedHolidays,
+                    lastUpdated: new Date().toISOString()
+                });
+            };
+        }
+
+        // Core Attendance Functions
+        function checkIn() {
+            const employeeName = document.getElementById('employeeName').value.trim();
+            const employeeId = document.getElementById('employeeId').value.trim();
+            const location = document.getElementById('checkInLocation').value.trim();
+
+            if (!employeeName || !employeeId) {
+                showMessage('Please enter employee name and ID first', 'error');
+                return;
+            }
+
+            if (!location) {
+                showMessage('Please enter check-in location', 'error');
+                return;
+            }
+
+            const now = new Date();
+            const record = {
+                id: now.getTime() + Math.random(),
+                timestamp: now.toISOString(),
+                date: now.toDateString(),
+                time: now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
+                type: 'CHECK_IN',
+                location: location,
+                employeeName: employeeName,
+                employeeId: employeeId,
+                isHoliday: false,
+                isOnline: isOnline
+            };
+
+            attendanceData.push(record);
+            saveData();
+            showMessage(`Check-in successful! Time: ${record.time} | Location: ${location}`, 'success');
+            updateDisplay();
+        }
+
+        function checkOut() {
+            const employeeName = document.getElementById('employeeName').value.trim();
+            const employeeId = document.getElementById('employeeId').value.trim();
+            const location = document.getElementById('checkOutLocation').value.trim();
+
+            if (!employeeName || !employeeId) {
+                showMessage('Please enter employee name and ID first', 'error');
+                return;
+            }
+
+            if (!location) {
+                showMessage('Please enter check-out location', 'error');
+                return;
+            }
+
+            const now = new Date();
+            const record = {
+                id: now.getTime() + Math.random(),
+                timestamp: now.toISOString(),
+                date: now.toDateString(),
+                time: now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
+                type: 'CHECK_OUT',
+                location: location,
+                employeeName: employeeName,
+                employeeId: employeeId,
+                isHoliday: false,
+                isOnline: isOnline
+            };
+
+            attendanceData.push(record);
+            saveData();
+            showMessage(`Check-out successful! Time: ${record.time} | Location: ${location}`, 'success');
+            updateDisplay();
+        }
+
+        function markAsHoliday() {
+            const employeeName = document.getElementById('employeeName').value.trim();
+            const employeeId = document.getElementById('employeeId').value.trim();
+
+            if (!employeeName || !employeeId) {
+                showMessage('Please enter employee name and ID first', 'error');
+                return;
+            }
+
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+
+            const record = {
+                id: now.getTime() + Math.random(),
+                timestamp: now.toISOString(),
+                date: now.toDateString(),
+                time: now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
+                type: 'HOLIDAY',
+                location: 'Holiday',
+                employeeName: employeeName,
+                employeeId: employeeId,
+                isHoliday: true,
+                isOnline: isOnline
+            };
+
+            attendanceData.push(record);
+            if (!savedHolidays.includes(today)) {
+                savedHolidays.push(today);
+            }
+            saveData();
+            showMessage(`Holiday marked successfully! Enjoy your day off!`, 'success');
+            updateDisplay();
+        }
+
+        function deleteRecord(id) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Delete Record</h3>
+                    <p>Are you sure you want to delete this attendance record?</p>
+                    <br>
+                    <button class="btn btn-delete" onclick="confirmDelete('${id}', this.parentElement.parentElement)">
+                        Yes, Delete
+                    </button>
+                    <button class="btn" onclick="this.parentElement.parentElement.remove()" style="background: #6c757d; color: white; margin-left: 10px;">
+                        Cancel
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function confirmDelete(id, modal) {
+            const index = attendanceData.findIndex(record => record.id == id);
+            if (index !== -1) {
+                const record = attendanceData[index];
+                if (record.isHoliday) {
+                    const holidayDate = new Date(record.timestamp).toISOString().split('T')[0];
+                    savedHolidays = savedHolidays.filter(h => h !== holidayDate);
+                }
+                attendanceData.splice(index, 1);
+                saveData();
+                updateDisplay();
+                showMessage('Record deleted successfully', 'success');
+            }
+            modal.remove();
+        }
+
+        // Display and Statistics
+        function updateDisplay() {
+            const tableBody = document.getElementById('attendanceTableBody');
+            const noDataMessage = document.getElementById('noDataMessage');
+
+            if (attendanceData.length === 0) {
+                tableBody.innerHTML = '';
+                noDataMessage.style.display = 'block';
+                updateStats(0, 0, 0, 0);
+                return;
+            }
+
+            noDataMessage.style.display = 'none';
+
+            // Sort by timestamp (newest first)
+            const sortedData = [...attendanceData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            let totalHours = 0;
+            let completeSessions = 0;
+            let totalHolidays = savedHolidays.length;
+
+            // Calculate sessions and hours
+            for (let i = 0; i < sortedData.length - 1; i++) {
+                const current = sortedData[i];
+                const next = sortedData[i + 1];
+
+                if (current.type === 'CHECK_OUT' && next.type === 'CHECK_IN') {
+                    const checkOutTime = new Date(current.timestamp);
+                    const checkInTime = new Date(next.timestamp);
+                    const diffHours = (checkOutTime - checkInTime) / (1000 * 60 * 60);
+
+                    if (diffHours > 0 && diffHours < 24) {
+                        totalHours += diffHours;
+                        completeSessions++;
+                    }
+                }
+            }
+
+            // Generate table rows
+            tableBody.innerHTML = sortedData.map((record, index) => {
+                let duration = 'N/A';
+                let rowClass = '';
+
+                if (record.type === 'CHECK_OUT' && index < sortedData.length - 1) {
+                    const nextRecord = sortedData[index + 1];
+                    if (nextRecord.type === 'CHECK_IN') {
+                        const checkOutTime = new Date(record.timestamp);
+                        const checkInTime = new Date(nextRecord.timestamp);
+                        const diffMinutes = (checkOutTime - checkInTime) / (1000 * 60);
+                        if (diffMinutes > 0 && diffMinutes < 24 * 60) {
+                            const hours = Math.floor(diffMinutes / 60);
+                            const mins = Math.round(diffMinutes % 60);
+                            duration = `${hours}h ${mins}m`;
+                        }
+                    }
+                }
+
+                if (record.isHoliday) rowClass = 'holiday-row';
+                else if (record.type === 'CHECK_IN') rowClass = 'checkin-row';
+                else if (record.type === 'CHECK_OUT') rowClass = 'checkout-row';
+
+                const typeIcon = {
+                    'CHECK_IN': '📥',
+                    'CHECK_OUT': '📤',
+                    'HOLIDAY': '🎉'
+                };
+
+                const connectionIcon = record.isOnline ? '🌐' : '📱';
+
+                return `
+                    <tr class="${rowClass}">
+                        <td>${new Date(record.timestamp).toLocaleString()}</td>
+                        <td>${typeIcon[record.type]} ${record.type.replace('_', ' ')}</td>
+                        <td>${record.location}</td>
+                        <td>${record.employeeName} (${record.employeeId})</td>
+                        <td>${duration}</td>
+                        <td>${record.isHoliday ? '🎉 Yes' : '❌ No'}</td>
+                        <td>
+                            <button class="btn btn-delete" onclick="deleteRecord('${record.id}')">
+                                🗑️ Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateStats(attendanceData.length, completeSessions, totalHours, totalHolidays);
+        }
+
+        function updateStats(entries, sessions, hours, holidays) {
+            document.getElementById('totalEntries').textContent = entries;
+            document.getElementById('completeSessions').textContent = sessions;
+            document.getElementById('totalHours').textContent = hours.toFixed(1);
+            document.getElementById('totalHolidays').textContent = holidays;
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('statusMessage');
+            messageDiv.textContent = message;
+            messageDiv.className = `status-message ${type}`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = '';
+            }, 5000);
+        }
+
+        // Export Functions
+        function downloadCSVReport() {
+            if (attendanceData.length === 0) {
+                showMessage('No data available for export', 'error');
+                return;
+            }
+
+            const headers = [
+                'Timestamp', 'Date', 'Time', 'Type', 'Location', 
+                'Employee Name', 'Employee ID', 'Holiday', 'Connection'
+            ];
+
+            const csvData = attendanceData.map(record => [
+                record.timestamp,
+                new Date(record.timestamp).toLocaleDateString(),
+                record.time,
+                record.type,
+                record.location,
+                record.employeeName,
+                record.employeeId,
+                record.isHoliday ? 'Yes' : 'No',
+                record.isOnline ? 'Online' : 'Offline'
+            ]);
+
+            const csvContent = [
+                headers.join(','),
+                ...csvData.map(row => row.map(field => `"${field}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `attendance_report_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            showMessage('CSV report downloaded successfully!', 'success');
+        }
+
+        function downloadPDFReport() {
+            if (attendanceData.length === 0) {
+                showMessage('No data available for export', 'error');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Header
+            doc.setFontSize(18);
+            doc.text('Unlimited Attendance System Report', 14, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`Employee: ${document.getElementById('employeeName').value || 'N/A'}`, 14, 35);
+            doc.text(`Employee ID: ${document.getElementById('employeeId').value || 'N/A'}`, 14, 45);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 55);
+            doc.text(`Total Records: ${attendanceData.length}`, 14, 65);
+
+            // Table data
+            const tableHeaders = ['Date', 'Time', 'Type', 'Location', 'Holiday'];
+            const tableData = attendanceData.map(record => [
+                new Date(record.timestamp).toLocaleDateString(),
+                record.time,
+                record.type,
+                record.location.length > 20 ? record.location.substring(0, 20) + '...' : record.location,
+                record.isHoliday ? 'Yes' : 'No'
+            ]);
+
+            doc.autoTable({
+                startY: 75,
+                head: [tableHeaders],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [102, 126, 234] },
+                styles: { fontSize: 10 },
+                margin: { top: 75 }
+            });
+
+            doc.save(`attendance_report_${new Date().toISOString().split('T')[0]}.pdf`);
+            showMessage('PDF report downloaded successfully!', 'success');
+        }
+
+        function deleteAllData() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>⚠️ Delete All Data</h3>
+                    <p>This will permanently delete all attendance records, holidays, and saved information. This action cannot be undone.</p>
+                    <p><strong>Are you absolutely sure?</strong></p>
+                    <br>
+                    <button class="btn btn-delete" onclick="confirmDeleteAll(this.parentElement.parentElement)">
+                        🗑️ Yes, Delete Everything
+                    </button>
+                    <button class="btn" onclick="this.parentElement.parentElement.remove()" style="background: #6c757d; color: white; margin-left: 10px;">
+                        ❌ Cancel
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function confirmDeleteAll(modal) {
+            try {
+                // Clear all localStorage
+                const keysToDelete = [
+                    'unlimitedAttendanceData', 
+                    'savedHolidays', 
+                    'employeeName', 
+                    'employeeId', 
+                    'checkInLocation', 
+                    'checkOutLocation'
+                ];
+                
+                keysToDelete.forEach(key => localStorage.removeItem(key));
+
+                // Clear IndexedDB
+                indexedDB.deleteDatabase('UnlimitedAttendanceDB');
+
+                // Reset application state
+                attendanceData = [];
+                savedHolidays = [];
+                
+                // Clear form fields
+                document.getElementById('employeeName').value = '';
+                document.getElementById('employeeId').value = '';
+                document.getElementById('checkInLocation').value = '';
+                document.getElementById('checkOutLocation').value = '';
+
+                updateDisplay();
+                modal.remove();
+                showMessage('All data deleted successfully!', 'success');
+            } catch (error) {
+                console.error('Error deleting data:', error);
+                showMessage('Error deleting data', 'error');
+            }
+        }
+
+        // Auto-save data every 30 seconds
+        setInterval(() => {
+            if (attendanceData.length > 0) {
+                saveData();
+                console.log('Auto-saved data at', new Date().toLocaleTimeString());
+            }
+        }, 30000);
+
+        // Save data before page unload
+        window.addEventListener('beforeunload', () => {
+            saveData();
+        });
+
+        // Handle page visibility for better performance
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                saveData();
+            }
+        });
+    </script>
+</body>
+</html>
