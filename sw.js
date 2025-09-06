@@ -1,281 +1,335 @@
-const CACHE_NAME = 'unlimited-attendance-v3';
-const STATIC_CACHE = 'unlimited-attendance-static-v3';
-const DYNAMIC_CACHE = 'unlimited-attendance-dynamic-v3';
-
+const CACHE_NAME = 'attendance-system-v2';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js'
+  '/?utm_source=pwa',
+  '/?action=checkin',
+  '/?action=checkout'
 ];
 
 // Install event - cache resources
-self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
+self.addEventListener('install', function(event) {
+  console.log('Service Worker: Installing...');
   event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('[SW] Caching app shell');
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('Service Worker: Caching files');
         return cache.addAll(urlsToCache);
       })
-      .then(() => {
-        console.log('[SW] Skip waiting for activation');
-        return self.skipWaiting();
-      })
-      .catch((error) => {
-        console.error('[SW] Cache failed during install', error);
+      .catch(function(error) {
+        console.error('Service Worker: Cache failed', error);
       })
   );
+  // Force the waiting service worker to become active immediately
+  self.skipWaiting();
 });
 
-// Activate event - cleanup old caches
-self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
+// Activate event - clean up old caches
+self.addEventListener('activate', function(event) {
+  console.log('Service Worker: Activating...');
   event.waitUntil(
-    Promise.all([
-      // Clean up old caches
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-              console.log('[SW] Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      }),
-      // Take control of all clients
-      self.clients.claim()
-    ])
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Service Worker: Deleting old cache', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
+  // Take control of all clients immediately
+  self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
+// Fetch event - serve from cache first, then network
+self.addEventListener('fetch', function(event) {
+  // Only handle GET requests
   if (event.request.method !== 'GET') {
     return;
   }
 
-  // Skip chrome-extension requests
-  if (event.request.url.startsWith('chrome-extension://')) {
+  // Skip cross-origin requests
+  if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
   event.respondWith(
     caches.match(event.request)
-      .then((response) => {
+      .then(function(response) {
         // Return cached version if available
         if (response) {
-          console.log('[SW] Serving from cache:', event.request.url);
+          console.log('Service Worker: Serving from cache', event.request.url);
           return response;
         }
 
-        // Clone the request for caching
-        const requestClone = event.request.clone();
-        
-        console.log('[SW] Fetching from network:', event.request.url);
-        return fetch(requestClone)
-          .then((response) => {
-            // Check if we received a valid response
+        // Clone the request for network fetch
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest).then(
+          function(response) {
+            // Check if valid response
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
 
-            // Clone the response for caching
-            const responseClone = response.clone();
-            
-            // Determine which cache to use
-            const cacheToUse = urlsToCache.includes(event.request.url) ? STATIC_CACHE : DYNAMIC_CACHE;
-            
-            // Add to appropriate cache
-            caches.open(cacheToUse)
-              .then((cache) => {
-                // Only cache GET requests
-                if (event.request.method === 'GET') {
-                  cache.put(event.request, responseClone);
-                }
-              })
-              .catch((error) => {
-                console.error('[SW] Error caching response:', error);
+            // Clone response for caching
+            const responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(function(cache) {
+                // Cache the new response
+                cache.put(event.request, responseToCache);
               });
 
             return response;
-          })
-          .catch((error) => {
-            console.error('[SW] Fetch failed:', error);
-            
-            // Return offline fallback for HTML requests
-            if (event.request.destination === 'document') {
-              return caches.match('/index.html');
-            }
-            
-            // For other requests, return a generic offline response
-            if (event.request.destination === 'image') {
-              return new Response(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f0f0f0"/><text x="100" y="100" text-anchor="middle" fill="#999">📱 Offline</text></svg>',
-                { headers: { 'Content-Type': 'image/svg+xml' } }
-              );
-            }
-            
-            return new Response(
-              JSON.stringify({ error: 'Network unavailable', offline: true }),
-              { 
-                status: 503,
-                statusText: 'Service Unavailable',
-                headers: { 'Content-Type': 'application/json' }
-              }
-            );
+          }
+        ).catch(function(error) {
+          console.log('Service Worker: Network failed, serving offline fallback');
+          
+          // Return offline fallback for HTML requests
+          if (event.request.headers.get('accept') && 
+              event.request.headers.get('accept').includes('text/html')) {
+            return caches.match('/') || createOfflineResponse();
+          }
+          
+          // For other requests, return generic offline response
+          return new Response('Offline', { 
+            status: 503, 
+            statusText: 'Service Unavailable' 
           });
-      })
+        });
+      }
+    )
   );
 });
 
-// Background sync for data backup
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'background-sync') {
-    console.log('[SW] Background sync triggered');
-    event.waitUntil(doBackgroundSync());
-  }
-});
-
-function doBackgroundSync() {
-  return new Promise((resolve) => {
-    // Here you could implement data synchronization logic
-    // For example, sync attendance data to a remote server when online
-    console.log('[SW] Performing background sync...');
-    
-    // Check if IndexedDB has data to sync
-    const request = indexedDB.open('UnlimitedAttendanceDB', 1);
-    request.onsuccess = function(event) {
-      const db = event.target.result;
-      if (db.objectStoreNames.contains('attendance')) {
-        const transaction = db.transaction(['attendance'], 'readonly');
-        const store = transaction.objectStore('attendance');
-        const getRequest = store.get('unlimitedData');
-        
-        getRequest.onsuccess = function() {
-          if (getRequest.result) {
-            console.log('[SW] Found data to potentially sync:', getRequest.result.attendanceData.length, 'records');
-            // Here you would send data to your server
-          }
-          resolve();
-        };
-      } else {
-        resolve();
-      }
-    };
-    
-    request.onerror = function() {
-      console.error('[SW] Error accessing IndexedDB during sync');
-      resolve();
-    };
+// Create offline response
+function createOfflineResponse() {
+  return new Response(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Offline - Attendance System</title>
+      <style>
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+          margin: 0;
+          padding: 0;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+        .container {
+          background: rgba(255,255,255,0.1);
+          padding: 3rem 2rem;
+          border-radius: 20px;
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,0.2);
+          max-width: 500px;
+          margin: 1rem;
+        }
+        h1 { 
+          font-size: 2.5rem; 
+          margin: 0 0 1rem 0;
+          font-weight: 700;
+        }
+        p { 
+          font-size: 1.2rem; 
+          margin: 0 0 2rem 0;
+          opacity: 0.9;
+          line-height: 1.5;
+        }
+        .retry-btn {
+          background: #4CAF50;
+          color: white;
+          padding: 1rem 2rem;
+          border: none;
+          border-radius: 12px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-decoration: none;
+          display: inline-block;
+        }
+        .retry-btn:hover { 
+          background: #45a049; 
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .status {
+          background: rgba(255,152,0,0.2);
+          border: 1px solid rgba(255,152,0,0.3);
+          padding: 1rem;
+          border-radius: 8px;
+          margin: 1rem 0;
+          font-size: 0.9rem;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>📱 You're Offline</h1>
+        <div class="status">
+          ⚡ Running in offline mode
+        </div>
+        <p>The Attendance System works offline! Your data is saved locally and will sync when you're back online.</p>
+        <button class="retry-btn" onclick="window.location.reload()">
+          🔄 Try Again
+        </button>
+      </div>
+      <script>
+        // Auto-reload when back online
+        window.addEventListener('online', function() {
+          setTimeout(() => window.location.reload(), 1000);
+        });
+      </script>
+    </body>
+    </html>
+  `, {
+    headers: { 
+      'Content-Type': 'text/html',
+      'Cache-Control': 'no-cache'
+    }
   });
 }
 
-// Push notifications support
-self.addEventListener('push', (event) => {
-  const options = {
-    body: event.data ? event.data.text() : 'Attendance reminder - Don\'t forget to check in/out!',
-    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" fill="%23667eea"%3E%3Crect width="192" height="192" fill="%23667eea" rx="20"/%3E%3Cpath fill="white" d="M48 64h96v8H48zm0 16h96v8H48zm0 16h96v8H48zm0 16h64v8H48z"/%3E%3Ccircle fill="white" cx="128" cy="112" r="12"/%3E%3Cpath fill="white" d="M122 106l4 4 8-8v16l-8-8-4 4z"/%3E%3C/svg%3E',
-    badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72"%3E%3Crect width="72" height="72" fill="%23667eea" rx="8"/%3E%3Cpath fill="white" d="M20 24h32v4H20zm0 8h32v4H20zm0 16h20v4H20z"/%3E%3C/svg%3E',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 'attendance-notification'
-    },
-    actions: [
-      {
-        action: 'checkin',
-        title: 'Quick Check-in',
-        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234CAF50"%3E%3Cpath d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/%3E%3C/svg%3E'
-      },
-      {
-        action: 'view',
-        title: 'Open App',
-        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23667eea"%3E%3Cpath d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/%3E%3C/svg%3E'
-      }
-    ],
-    tag: 'attendance-reminder',
-    requireInteraction: true
-  };
+// Background sync for future data synchronization
+self.addEventListener('sync', function(event) {
+  if (event.tag === 'attendance-sync') {
+    console.log('Service Worker: Background sync triggered');
+    event.waitUntil(syncAttendanceData());
+  }
+});
 
-  event.waitUntil(
-    self.registration.showNotification('Attendance System', options)
-  );
+// Sync attendance data (placeholder for server sync)
+function syncAttendanceData() {
+  return new Promise((resolve, reject) => {
+    // Future implementation: sync with server
+    console.log('Service Worker: Syncing attendance data...');
+    setTimeout(resolve, 1000);
+  });
+}
+
+// Push notification support
+self.addEventListener('push', function(event) {
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      const options = {
+        body: data.body || 'New attendance notification',
+        icon: '/icon-192.png',
+        badge: '/icon-72.png',
+        vibrate: [100, 50, 100],
+        data: {
+          dateOfArrival: Date.now(),
+          primaryKey: data.primaryKey || Date.now()
+        },
+        actions: [
+          {
+            action: 'view',
+            title: 'View App',
+            icon: '/icon-96.png'
+          },
+          {
+            action: 'close',
+            title: 'Close',
+            icon: '/icon-96.png'
+          }
+        ],
+        requireInteraction: true
+      };
+
+      event.waitUntil(
+        self.registration.showNotification(
+          data.title || 'Attendance System', 
+          options
+        )
+      );
+    } catch (error) {
+      console.error('Push notification error:', error);
+    }
+  }
 });
 
 // Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notification clicked:', event.action);
+self.addEventListener('notificationclick', function(event) {
   event.notification.close();
 
-  if (event.action === 'checkin') {
-    // Open app and trigger check-in
+  if (event.action === 'view') {
     event.waitUntil(
-      clients.openWindow('/?action=checkin')
-    );
-  } else if (event.action === 'view') {
-    // Just open the app
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  } else {
-    // Default action - open app
-    event.waitUntil(
-      clients.openWindow('/')
+      clients.matchAll({ type: 'window' }).then(function(clientList) {
+        // If app is already open, focus it
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url === '/' && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // Otherwise open new window
+        if (clients.openWindow) {
+          return clients.openWindow('/');
+        }
+      })
     );
   }
 });
 
-// Handle notification close
-self.addEventListener('notificationclose', (event) => {
-  console.log('[SW] Notification closed');
-  // Optional: track notification close events
-});
-
-// Cache size management
-self.addEventListener('message', (event) => {
+// Handle messages from main thread
+self.addEventListener('message', function(event) {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
   
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
+  if (event.data && event.data.type === 'UPDATE_CACHE') {
+    console.log('Service Worker: Manual cache update requested');
     event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName.startsWith('unlimited-attendance-')) {
-              console.log('[SW] Clearing cache:', cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
+      caches.open(CACHE_NAME).then(function(cache) {
+        return cache.addAll(urlsToCache);
       })
     );
   }
 });
 
-// Periodic background sync (if supported)
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'attendance-sync') {
-    event.waitUntil(doBackgroundSync());
+// Handle client communication
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'GET_VERSION') {
+    event.ports[0].postMessage({
+      version: CACHE_NAME,
+      cached: urlsToCache
+    });
   }
 });
 
-// Error handling
-self.addEventListener('error', (event) => {
-  console.error('[SW] Error:', event.error);
+// Periodic background sync (if supported)
+self.addEventListener('periodicsync', function(event) {
+  if (event.tag === 'attendance-background-sync') {
+    event.waitUntil(syncAttendanceData());
+  }
 });
 
-self.addEventListener('unhandledrejection', (event) => {
-  console.error('[SW] Unhandled promise rejection:', event.reason);
+// Handle app shortcuts
+self.addEventListener('notificationclick', function(event) {
+  const action = event.action;
+  
+  if (action === 'checkin') {
+    event.waitUntil(
+      clients.openWindow('/?action=checkin')
+    );
+  } else if (action === 'checkout') {
+    event.waitUntil(
+      clients.openWindow('/?action=checkout')
+    );
+  }
+  
+  event.notification.close();
 });
-
-// Update check
-self.addEventListener('updatefound', () => {
-  console.log('[SW] Update found');
-});
-
-console.log('[SW] Service Worker script loaded successfully');

@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unlimited Offline Attendance System</title>
-    <link rel="manifest" href="./manifest.json">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#667eea">
@@ -14,10 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Attendance System">
     <meta name="msapplication-TileColor" content="#667eea">
-    
-    <!-- App Icons -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23667eea'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQXR0ZW5kYW5jZSBTeXN0ZW0iLCJzaG9ydF9uYW1lIjoiQXR0ZW5kYW5jZSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjNjY3ZWVhIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1qUWlJR2hsYVdkb2REMGlNalFpSUhabGNuTnBiMjQ5SWpFdU1TSWdlRzFzYm5NOUltaDBkSEE2THk5M2QzY3Vkek11YjNKbkx6SXdNREF2YzNabklqNDhjakJsWTE0cUlHWnBiR3c5SWlNMk5qZGxaV0VpSUM4K1BDOXpkbWMrIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJzaXplcyI6IjI0eDI0In1dfQ==">
     
     <style>
         * {
@@ -25,7 +19,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         :root {
             --primary-color: #667eea;
             --secondary-color: #764ba2;
@@ -38,7 +31,6 @@
             --border-color: #ddd;
             --shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -46,12 +38,10 @@
             padding: 10px;
             color: var(--text-dark);
         }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-
         .card {
             background: white;
             border-radius: 15px;
@@ -60,12 +50,10 @@
             box-shadow: var(--shadow);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 15px 40px rgba(0,0,0,0.15);
         }
-
         .header {
             text-align: center;
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
@@ -75,7 +63,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .header::before {
             content: '';
             position: absolute;
@@ -86,21 +73,18 @@
             background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
             pointer-events: none;
         }
-
         .header h1 {
             font-size: clamp(1.8rem, 4vw, 2.8rem);
             margin-bottom: 15px;
             position: relative;
             z-index: 1;
         }
-
         .header p {
             font-size: clamp(1rem, 2.5vw, 1.2rem);
             opacity: 0.9;
             position: relative;
             z-index: 1;
         }
-
         .current-time {
             font-size: clamp(2rem, 6vw, 3.5rem);
             font-family: 'Courier New', monospace;
@@ -110,14 +94,12 @@
             z-index: 1;
             font-weight: bold;
         }
-
         .current-date {
             font-size: clamp(1rem, 2.5vw, 1.3rem);
             opacity: 0.9;
             position: relative;
             z-index: 1;
         }
-
         .status-indicator {
             display: inline-flex;
             align-items: center;
@@ -129,31 +111,26 @@
             position: relative;
             z-index: 1;
         }
-
         .status-online {
             background: rgba(76, 175, 80, 0.2);
             color: #4CAF50;
             border: 2px solid rgba(76, 175, 80, 0.3);
         }
-
         .status-offline {
             background: rgba(255, 152, 0, 0.2);
             color: #FF9800;
             border: 2px solid rgba(255, 152, 0, 0.3);
         }
-
         .form-group {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 25px;
         }
-
         .input-group {
             display: flex;
             flex-direction: column;
         }
-
         .input-group label {
             margin-bottom: 8px;
             font-weight: 600;
@@ -163,8 +140,7 @@
             align-items: center;
             gap: 8px;
         }
-
-        .input-group input, .input-group select {
+        .input-group input, .input-group select, .input-group textarea {
             padding: 14px 16px;
             border: 2px solid var(--border-color);
             border-radius: 10px;
@@ -172,15 +148,19 @@
             transition: all 0.3s ease;
             width: 100%;
             background: white;
+            font-family: inherit;
         }
-
-        .input-group input:focus, .input-group select:focus {
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            max-height: 150px;
+        }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             transform: translateY(-1px);
         }
-
         .button-group {
             display: flex;
             justify-content: center;
@@ -188,7 +168,6 @@
             margin: 25px 0;
             flex-wrap: wrap;
         }
-
         .btn {
             padding: 14px 28px;
             font-size: clamp(14px, 2.5vw, 16px);
@@ -206,7 +185,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .btn::before {
             content: '';
             position: absolute;
@@ -219,36 +197,29 @@
             transform: translate(-50%, -50%);
             transition: width 0.6s, height 0.6s;
         }
-
         .btn:hover::before {
             width: 300px;
             height: 300px;
         }
-
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
-
         .btn:active {
             transform: translateY(-1px);
         }
-
         .btn-checkin {
             background: linear-gradient(45deg, var(--success-color), #45a049);
             color: white;
         }
-
         .btn-checkout {
             background: linear-gradient(45deg, var(--error-color), #da190b);
             color: white;
         }
-
         .btn-holiday {
             background: linear-gradient(45deg, var(--warning-color), #FFAC33);
             color: white;
         }
-
         .btn-delete {
             background: #e74c3c;
             color: white;
@@ -257,14 +228,27 @@
             min-width: auto;
             border-radius: 6px;
         }
-
+        .btn-edit {
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            font-size: 12px;
+            min-width: auto;
+            border-radius: 6px;
+        }
+        .btn-install {
+            background: linear-gradient(45deg, #9c27b0, #673ab7);
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin: 10px;
+        }
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 25px;
         }
-
         .stat-card {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -274,63 +258,31 @@
             position: relative;
             overflow: hidden;
         }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s ease;
-        }
-
-        .stat-card:hover::before {
-            animation: shine 1s ease-in-out;
-        }
-
-        @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .stat-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
         .stat-number {
             font-size: clamp(2rem, 4vw, 3rem);
             font-weight: bold;
             margin: 10px 0;
         }
-
         .stat-label {
             font-size: clamp(0.9rem, 2vw, 1rem);
             opacity: 0.9;
         }
-
         .download-section {
             background: var(--background-light);
             padding: 25px;
             border-radius: 15px;
             margin-bottom: 20px;
         }
-
         .download-header {
             text-align: center;
             margin-bottom: 20px;
         }
-
         .download-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
             flex-wrap: wrap;
         }
-
         .btn-download, .btn-pdf {
             background: linear-gradient(45deg, #2196F3, #1976D2);
             color: white;
@@ -346,11 +298,9 @@
             align-items: center;
             gap: 8px;
         }
-
         .btn-pdf {
             background: linear-gradient(45deg, #FF5722, #E64A19);
         }
-
         .table-container {
             overflow-x: auto;
             max-height: 500px;
@@ -359,23 +309,21 @@
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
         .attendance-table {
             width: 100%;
             border-collapse: collapse;
             margin: 0;
-            min-width: 900px;
+            min-width: 1200px;
             background: white;
         }
-
         .attendance-table th,
         .attendance-table td {
             padding: 14px 12px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
             font-size: clamp(13px, 2vw, 14px);
+            vertical-align: top;
         }
-
         .attendance-table th {
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -384,26 +332,70 @@
             top: 0;
             z-index: 10;
         }
-
         .attendance-table tbody tr:hover {
             background: #f8f9ff;
             transform: scale(1.01);
             transition: all 0.2s ease;
         }
-
         .holiday-row {
             background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
-            font-weight: 600;
+            border-left: 4px solid var(--warning-color);
         }
-
-        .checkin-row {
-            background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+        .description-cell {
+            max-width: 200px;
+            word-wrap: break-word;
+            font-size: 12px;
+            line-height: 1.3;
+            position: relative;
         }
-
-        .checkout-row {
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb) !important;
+        
+        .description-preview {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            background: rgba(102, 126, 234, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
         }
-
+        
+        .description-preview:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .description-preview.clickable::after {
+            content: ' Click to view full';
+            font-size: 10px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .description-full {
+            max-height: none;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: rgba(76, 175, 80, 0.05);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+        
+        .description-full::after {
+            content: ' Click to collapse';
+            font-size: 10px;
+            color: var(--success-color);
+            font-weight: bold;
+            display: block;
+            margin-top: 4px;
+        }
+        
         .status-message {
             text-align: center;
             padding: 15px;
@@ -412,160 +404,290 @@
             font-size: clamp(14px, 2.5vw, 16px);
             font-weight: 500;
         }
-
         .success {
             background: linear-gradient(135deg, #d4edda, #c3e6cb);
             color: #155724;
             border: 2px solid #b8dabd;
         }
-
         .error {
             background: linear-gradient(135deg, #f8d7da, #f5c6cb);
             color: #721c24;
             border: 2px solid #f1b0b7;
         }
-
         .no-data {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-light);
             font-size: clamp(16px, 3vw, 18px);
         }
-
-        /* Install Prompt Styles */
-        .install-prompt {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 30px;
-            z-index: 9999;
-        }
-
-        .install-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        .install-icon {
-            font-size: 4rem;
+        
+        .install-banner {
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-
-        /* Modal Styles */
+        
+        .install-banner.hidden {
+            display: none;
+        }
+        
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 10000;
-            padding: 20px;
-            backdrop-filter: blur(5px);
+            padding: 15px;
+            backdrop-filter: blur(8px);
+            animation: modalBackdropFadeIn 0.3s ease;
         }
-
+        
+        @keyframes modalBackdropFadeIn {
+            from { 
+                background: rgba(0,0,0,0);
+                backdrop-filter: blur(0px);
+            }
+            to { 
+                background: rgba(0,0,0,0.8);
+                backdrop-filter: blur(8px);
+            }
+        }
+        
         .modal-content {
             background: white;
-            padding: 35px;
             border-radius: 20px;
-            text-align: center;
-            max-width: 450px;
+            max-width: 750px;
             width: 100%;
+            max-height: 95vh;
+            overflow: hidden;
             box-shadow: 0 25px 80px rgba(0,0,0,0.3);
-            transform: scale(0.9);
-            animation: modalAppear 0.3s ease forwards;
+            transform: scale(0.8) translateY(20px);
+            animation: modalContentSlideIn 0.4s ease forwards;
+            display: flex;
+            flex-direction: column;
         }
-
-        @keyframes modalAppear {
-            to { transform: scale(1); }
+        
+        @keyframes modalContentSlideIn {
+            to { 
+                transform: scale(1) translateY(0);
+            }
         }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body { padding: 8px; }
-            .card { padding: 20px; margin-bottom: 15px; }
-            .form-group { grid-template-columns: 1fr; gap: 15px; }
-            .button-group { flex-direction: column; align-items: center; }
-            .btn { width: 100%; max-width: 300px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
-            .download-buttons { flex-direction: column; align-items: center; }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px 20px;
+            border-bottom: 2px solid #f0f0f0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px 20px 0 0;
         }
-
-        @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .attendance-table th, .attendance-table td { padding: 10px 8px; }
+        
+        .modal-header h3 {
+            font-size: clamp(1.3rem, 3vw, 1.6rem);
+            font-weight: 600;
+            margin: 0;
         }
-
-        /* Custom Scrollbar */
-        .table-container::-webkit-scrollbar {
-            height: 8px;
-            width: 8px;
+        
+        .close-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
-
-        .table-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        
+        .close-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: scale(1.1);
+        }
+        
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .edit-form {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .edit-form label {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .edit-form input, .edit-form select, .edit-form textarea {
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
+            font-size: clamp(14px, 2.5vw, 16px);
+            transition: all 0.3s ease;
+            width: 100%;
+            background: white;
+            font-family: inherit;
         }
-
-        .table-container::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 10px;
+        
+        .edit-form textarea {
+            resize: vertical;
+            min-height: 80px;
+            max-height: 120px;
         }
-
-        .table-container::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary-color);
+        
+        .edit-form input:focus, .edit-form select:focus, .edit-form textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-
-        /* Pulse Animation for Status */
+        
+        .edit-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+        
+        .edit-buttons .btn {
+            min-width: 140px;
+        }
+        
         .pulse {
             animation: pulse 2s infinite;
         }
-
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .card { padding: 15px; margin-bottom: 15px; }
+            .form-group { grid-template-columns: 1fr; gap: 15px; }
+            .button-group { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 300px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .download-buttons { flex-direction: column; align-items: center; }
+            .attendance-table { min-width: 1000px; }
+            
+            .modal {
+                padding: 10px;
+            }
+            .modal-header {
+                padding: 20px 20px 15px;
+            }
+            .modal-body {
+                padding: 20px;
+            }
+            .edit-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .edit-buttons .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .attendance-table th, .attendance-table td { padding: 10px 8px; font-size: 12px; }
+            .attendance-table { min-width: 900px; }
+            .current-time { font-size: clamp(1.5rem, 6vw, 2.2rem); }
+            
+            .modal-header {
+                padding: 15px 15px 12px;
+            }
+            .modal-body {
+                padding: 15px;
+            }
+            .close-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+        }
+        
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+        
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
-    <!-- Install Prompt -->
-    <div id="installPrompt" class="install-prompt">
-        <div class="install-content">
-            <div class="install-icon">📱</div>
-            <h2>Install Attendance App</h2>
-            <p>Download this app for unlimited offline usage. Your data will be stored permanently on your device.</p>
-            <br>
-            <button class="btn btn-checkin" id="installButton">
-                ⬇️ Install App
-            </button>
-            <br><br>
-            <button class="btn" onclick="skipInstall()" style="background: #6c757d;">
-                ⏭️ Skip & Use Online
-            </button>
+    <div class="container">
+        <!-- Install Banner -->
+        <div id="installBanner" class="install-banner hidden">
+            <div>
+                <strong>Install this app for offline use!</strong>
+                <p>Get better performance and work without internet connection.</p>
+            </div>
+            <div>
+                <button class="btn-install" onclick="installApp()">Install App</button>
+                <button class="close-btn" onclick="hideInstallBanner()" style="margin-left: 10px;">×</button>
+            </div>
         </div>
-    </div>
-
-    <!-- Main App Container -->
-    <div id="appContainer" class="container">
+        
         <!-- Header Section -->
         <div class="card header">
-            <h1>🏢 Unlimited Attendance System</h1>
-            <p>Online/Offline | Unlimited Entries | Permanent Storage</p>
+            <h1>Unlimited Attendance System</h1>
+            <p>Online/Offline | Unlimited Entries | Complete Freedom</p>
             <div class="current-time" id="currentTime">00:00:00</div>
             <div class="current-date" id="currentDate"></div>
             <div id="connectionStatus" class="status-indicator status-online pulse">
@@ -573,35 +695,29 @@
                 <span id="statusText">Online - Ready for unlimited entries</span>
             </div>
         </div>
-
+        
         <!-- Employee Information -->
         <div class="card">
-            <h2>👤 Employee Information</h2>
+            <h2>Employee Information</h2>
             <div class="form-group">
                 <div class="input-group">
-                    <label for="employeeName">
-                        👨‍💼 Employee Name:
-                    </label>
+                    <label for="employeeName">Employee Name:</label>
                     <input type="text" id="employeeName" placeholder="Enter your full name" autocomplete="name">
                 </div>
                 <div class="input-group">
-                    <label for="employeeId">
-                        🆔 Employee ID:
-                    </label>
+                    <label for="employeeId">Employee ID:</label>
                     <input type="text" id="employeeId" placeholder="Enter your employee ID" autocomplete="username">
                 </div>
             </div>
         </div>
-
+        
         <!-- Location Information -->
         <div class="card">
-            <h2>📍 Location Information</h2>
+            <h2>Location & Notes</h2>
             <div class="form-group">
                 <div class="input-group">
-                    <label for="checkInLocation">
-                        📥 Check-in Location:
-                    </label>
-                    <input type="text" id="checkInLocation" placeholder="Enter check-in location" list="locations">
+                    <label for="checkInLocation">Current Location:</label>
+                    <input type="text" id="checkInLocation" placeholder="Enter current location" list="locations">
                     <datalist id="locations">
                         <option value="Office - Main Building">
                         <option value="Office - Branch">
@@ -611,92 +727,89 @@
                     </datalist>
                 </div>
                 <div class="input-group">
-                    <label for="checkOutLocation">
-                        📤 Check-out Location:
-                    </label>
-                    <input type="text" id="checkOutLocation" placeholder="Enter check-out location" list="locations">
+                    <label for="workDescription">Work Description/Notes:</label>
+                    <textarea id="workDescription" placeholder="Describe your work activities, meetings, projects, etc. (optional)"></textarea>
                 </div>
             </div>
         </div>
-
+        
         <!-- Action Buttons -->
         <div class="card">
-            <h2>⚡ Quick Actions</h2>
-            <p>Make unlimited entries - online or offline, anytime, anywhere!</p>
+            <h2>Quick Actions</h2>
+            <p>Multiple check-ins/check-outs allowed. Mark holidays anytime. Add descriptions to track your activities!</p>
             <div class="button-group">
                 <button class="btn btn-checkin" onclick="checkIn()">
-                    📥 Check In Now
+                    Check In Now
                 </button>
                 <button class="btn btn-checkout" onclick="checkOut()">
-                    📤 Check Out Now
+                    Check Out Now
                 </button>
-                <button class="btn btn-holiday" onclick="markAsHoliday()">
-                    🎉 Mark Holiday
+                <button class="btn btn-holiday" onclick="markHoliday()">
+                    Mark Holiday
                 </button>
             </div>
             <div id="statusMessage"></div>
         </div>
-
+        
         <!-- Statistics -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">📊</div>
-                <div class="stat-number" id="totalEntries">0</div>
-                <div class="stat-label">Total Entries</div>
+                <div class="stat-number" id="totalDays">0</div>
+                <div class="stat-label">Working Days</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">✅</div>
-                <div class="stat-number" id="completeSessions">0</div>
-                <div class="stat-label">Complete Sessions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">⏰</div>
                 <div class="stat-number" id="totalHours">0</div>
                 <div class="stat-label">Total Hours</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">🎉</div>
-                <div class="stat-number" id="totalHolidays">0</div>
-                <div class="stat-label">Holidays</div>
+                <div class="stat-number" id="holidayCount">0</div>
+                <div class="stat-label">Holidays Marked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalEntries">0</div>
+                <div class="stat-label">Total Entries</div>
             </div>
         </div>
-
+        
         <!-- Download Reports -->
         <div class="card">
             <div class="download-section">
                 <div class="download-header">
-                    <h3>📊 Download Reports</h3>
-                    <p>Export your attendance data for PC/Mobile with complete details</p>
+                    <h3>Download Reports</h3>
+                    <p>Export your attendance data with complete details including descriptions</p>
                 </div>
                 <div class="download-buttons">
                     <button class="btn-download" onclick="downloadCSVReport()">
-                        📊 Download CSV
+                        Download CSV
                     </button>
                     <button class="btn-pdf" onclick="downloadPDFReport()">
-                        📄 Download PDF
+                        Download PDF
                     </button>
                     <button class="btn btn-delete" onclick="deleteAllData()">
-                        🗑️ Clear All Data
+                        Clear All Data
                     </button>
                 </div>
             </div>
         </div>
-
+        
         <!-- Attendance Records Table -->
         <div class="card">
-            <h3>📋 All Attendance Records</h3>
-            <p>Complete history of all your entries with locations and durations</p>
+            <h3>Complete Attendance Records</h3>
+            <p>All entries with full edit capability and activity descriptions - no restrictions! Click on descriptions to view full text.</p>
             <div class="table-container">
                 <table class="attendance-table">
                     <thead>
                         <tr>
-                            <th>📅 Date & Time</th>
-                            <th>📍 Type</th>
-                            <th>🏢 Location</th>
-                            <th>👤 Employee</th>
-                            <th>⏱️ Duration</th>
-                            <th>🎉 Holiday</th>
-                            <th>⚡ Actions</th>
+                            <th>Date</th>
+                            <th>Check In</th>
+                            <th>In Location</th>
+                            <th>Check Out</th>
+                            <th>Out Location</th>
+                            <th>Duration</th>
+                            <th>Description/Notes</th>
+                            <th>Holiday/Event</th>
+                            <th>Employee</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="attendanceTableBody">
@@ -704,17 +817,82 @@
                 </table>
             </div>
             <div id="noDataMessage" class="no-data" style="display: none;">
-                📋 No attendance records yet. Start by checking in!
+                No attendance records yet. Start by checking in or marking a holiday!
             </div>
         </div>
     </div>
-
+    
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Attendance Entry</h3>
+                <button class="close-btn" onclick="closeEdit()" title="Close Modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-form">
+                    <div>
+                        <label>Date:</label>
+                        <input type="date" id="editDate">
+                    </div>
+                    
+                    <div>
+                        <label>Check In Time:</label>
+                        <input type="time" id="editCheckInTime">
+                    </div>
+                    
+                    <div>
+                        <label>Check In Location:</label>
+                        <input type="text" id="editCheckInLocation" placeholder="Enter check-in location">
+                    </div>
+                    
+                    <div>
+                        <label>Check Out Time:</label>
+                        <input type="time" id="editCheckOutTime">
+                    </div>
+                    
+                    <div>
+                        <label>Check Out Location:</label>
+                        <input type="text" id="editCheckOutLocation" placeholder="Enter check-out location">
+                    </div>
+                    
+                    <div>
+                        <label>Work Description/Notes:</label>
+                        <textarea id="editWorkDescription" placeholder="Describe work activities, meetings, projects, etc."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label>Holiday/Event Name:</label>
+                        <input type="text" id="editHoliday" placeholder="Enter holiday or event name">
+                    </div>
+                    
+                    <div>
+                        <label>Employee Name:</label>
+                        <input type="text" id="editEmployeeName" placeholder="Enter employee name">
+                    </div>
+                    
+                    <div>
+                        <label>Employee ID:</label>
+                        <input type="text" id="editEmployeeId" placeholder="Enter employee ID">
+                    </div>
+                </div>
+                
+                <div class="edit-buttons">
+                    <button class="btn btn-checkin" onclick="saveEdit()">Save Changes</button>
+                    <button class="btn btn-delete" onclick="closeEdit()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // Global Variables
         let attendanceData = [];
-        let savedHolidays = [];
         let isOnline = navigator.onLine;
-
+        let editingRecordId = null;
+        let deferredPrompt = null;
+        let isInstalled = false;
+        
         // Initialize App
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
@@ -723,574 +901,938 @@
             loadData();
             updateDisplay();
             updateConnectionStatus();
-            checkInstallPrompt();
+            handleURLParams();
+            checkInstallStatus();
         });
-
-        function initializeApp() {
-            // Register service worker when deployed
-            if ('serviceWorker' in navigator && location.protocol === 'https:') {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW registered'))
-                    .catch(err => console.log('SW registration failed'));
-            }
-        }
-
-        // PWA Installation
-        let deferredPrompt;
         
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installPrompt').style.display = 'flex';
-        });
-
-        document.getElementById('installButton').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log('Install outcome:', outcome);
-                deferredPrompt = null;
-            }
-            document.getElementById('installPrompt').style.display = 'none';
-        });
-
-        function skipInstall() {
-            document.getElementById('installPrompt').style.display = 'none';
-        }
-
-        function checkInstallPrompt() {
-            // Hide install prompt if already installed
+        function checkInstallStatus() {
+            // Check if already installed/running as standalone
             if (window.matchMedia('(display-mode: standalone)').matches || 
                 window.navigator.standalone === true) {
-                document.getElementById('installPrompt').style.display = 'none';
+                isInstalled = true;
+                hideInstallBanner();
+            }
+            
+            // For Android Chrome
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                isInstalled = true;
+                hideInstallBanner();
             }
         }
+        
+        function initializeApp() {
+            // Only show install banner if not already installed
+            if (!isInstalled) {
+                showInstallBanner();
+            }
+            
+            // Handle install prompt - this is the key for PC Chrome/Edge
+            window.addEventListener('beforeinstallprompt', function(e) {
+                console.log('PWA Install prompt triggered');
+                e.preventDefault(); // Prevent automatic showing
+                deferredPrompt = e; // Store for later use
+                
+                // Show our custom install banner
+                showInstallBanner();
+                
+                // Update install button to be more prominent
+                const installBtn = document.querySelector('.btn-install');
+                if (installBtn) {
+                    installBtn.textContent = '📱 Install App Now';
+                    installBtn.style.animation = 'pulse 2s infinite';
+                }
+            });
+            
+            // Handle successful installation
+            window.addEventListener('appinstalled', function(e) {
+                console.log('PWA was successfully installed');
+                isInstalled = true;
+                hideInstallBanner();
+                showMessage('App installed successfully! Opening as standalone app...', 'success');
+                deferredPrompt = null;
+            });
+            
+            // Register service worker for offline functionality
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js', {
+                        scope: '/'
+                    })
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                        
+                        // Handle updates
+                        registration.addEventListener('updatefound', function() {
+                            console.log('New service worker found');
+                        });
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+                });
+            }
+        }
+        
+        function showInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            if (banner && !isInstalled) {
+                banner.classList.remove('hidden');
+                banner.style.display = 'flex';
+            }
+        }
+        
+        function hideInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            if (banner) {
+                banner.classList.add('hidden');
+                banner.style.display = 'none';
+            }
+        }
+        
+        function installApp() {
+            // First try native browser installation
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                
+                deferredPrompt.userChoice.then(function(choiceResult) {
+                    console.log('User choice:', choiceResult.outcome);
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        isInstalled = true;
+                    } else {
+                        console.log('User dismissed the install prompt');
+                        // Still show manual instructions
+                        showManualInstallInstructions();
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                // Show manual installation instructions
+                showManualInstallInstructions();
+            }
+        }
+        
+        function showManualInstallInstructions() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isIOS = /ipad|iphone|ipod/.test(userAgent);
+            const isAndroid = /android/.test(userAgent);
+            const isChrome = userAgent.includes('chrome') && !userAgent.includes('edge');
+            const isEdge = userAgent.includes('edge');
+            const isFirefox = userAgent.includes('firefox');
+            const isSafari = userAgent.includes('safari') && !userAgent.includes('chrome');
+            
+            let title = 'Install App Instructions';
+            let instructions = '';
+            
+            if (isIOS && isSafari) {
+                instructions = `
+                    📱 iOS Safari Installation:
+                    
+                    1. Tap the Share button (⬆️) at the bottom
+                    2. Scroll down and tap "Add to Home Screen"
+                    3. Tap "Add" to confirm
+                    4. The app will appear on your home screen
+                    
+                    ✅ You can then use it offline!
+                `;
+            } else if (isAndroid && isChrome) {
+                instructions = `
+                    📱 Android Chrome Installation:
+                    
+                    1. Tap the menu (⋮) in the top right
+                    2. Tap "Add to Home screen" or "Install app"
+                    3. Tap "Install" to confirm
+                    4. The app will be installed like a native app
+                    
+                    ✅ You can then use it offline!
+                `;
+            } else if (isChrome) {
+                instructions = `
+                    💻 Desktop Chrome Installation:
+                    
+                    1. Look for the install icon (⊞) in the address bar, OR
+                    2. Click the menu (⋮) → "Install Attendance System..."
+                    3. Click "Install" to confirm
+                    4. The app will open in its own window
+                    
+                    ✅ You can then use it offline!
+                `;
+            } else if (isEdge) {
+                instructions = `
+                    💻 Microsoft Edge Installation:
+                    
+                    1. Click the menu (⋯) in the top right
+                    2. Go to "Apps" → "Install this site as an app"
+                    3. Click "Install" to confirm
+                    4. The app will be installed as a desktop app
+                    
+                    ✅ You can then use it offline!
+                `;
+            } else if (isFirefox) {
+                instructions = `
+                    🦊 Firefox Instructions:
+                    
+                    Firefox doesn't support app installation yet, but you can:
+                    
+                    1. Bookmark this page (Ctrl+D / Cmd+D)
+                    2. Access it anytime from bookmarks
+                    3. It works offline once loaded!
+                    
+                    💡 For best results, try Chrome or Edge
+                `;
+            } else {
+                instructions = `
+                    📱 General Instructions:
+                    
+                    Look for these options in your browser:
+                    • "Add to Home Screen" (mobile)
+                    • "Install App" (desktop)
+                    • Install icon in address bar
+                    • Browser menu → Apps/Install
+                    
+                    💡 Try Chrome or Edge for best experience
+                `;
+            }
+            
+            // Create and show modal with instructions
+            showInstallModal(title, instructions);
+        }
+        
+        function showInstallModal(title, instructions) {
+            // Create modal HTML
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>${title}</h3>
+                        <button class="close-btn" onclick="closeInstallModal()" title="Close">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <pre style="white-space: pre-wrap; font-family: inherit; line-height: 1.6; font-size: 14px;">${instructions}</pre>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-checkin" onclick="closeInstallModal()" style="min-width: 120px;">Got it!</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeInstallModal();
+                }
+            });
+            
+            // Store reference for closing
+            window.currentInstallModal = modal;
+        }
+        
+        function closeInstallModal() {
+            if (window.currentInstallModal) {
+                document.body.removeChild(window.currentInstallModal);
+                window.currentInstallModal = null;
+            }
+        }
+        
+        function handleURLParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+            
+            // Handle shortcuts from PWA
+            if (action === 'checkin') {
+                setTimeout(() => checkIn(), 1000);
+            } else if (action === 'checkout') {
+                setTimeout(() => checkOut(), 1000);
+            }
+        }
+        
+        // Modal Functions
+        function closeEdit() {
+            const modal = document.getElementById('editModal');
+            modal.style.display = 'none';
+            editingRecordId = null;
+        }
 
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('editModal');
+            if (modal.style.display !== 'none' && event.target === modal) {
+                closeEdit();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('editModal');
+                if (modal.style.display !== 'none') {
+                    closeEdit();
+                }
+            }
+        });
+        
+        // Enhanced description toggle function
+        function toggleDescription(element, recordId) {
+            const record = attendanceData.find(r => r.id === recordId);
+            if (!record || !record.workDescription) return;
+            
+            const isExpanded = element.classList.contains('description-full');
+            
+            if (isExpanded) {
+                // Collapse - show preview
+                element.className = 'description-preview clickable';
+                element.textContent = record.workDescription.length > 100 ? 
+                    record.workDescription.substring(0, 97) + '...' : 
+                    record.workDescription;
+            } else {
+                // Expand - show full text
+                element.className = 'description-full';
+                element.textContent = record.workDescription;
+            }
+        }
+        
         // Time and Date Functions
         function updateCurrentTime() {
             const now = new Date();
-            document.getElementById('currentTime').textContent = 
-                now.toLocaleTimeString('en-US', { 
-                    hour12: true, 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    second: '2-digit' 
-                });
-            document.getElementById('currentDate').textContent = 
-                now.toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: true, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            const dateString = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            document.getElementById('currentTime').textContent = timeString;
+            document.getElementById('currentDate').textContent = dateString;
         }
-
+        
         // Connection Status
         function updateConnectionStatus() {
-            const statusIcon = document.getElementById('statusIcon');
-            const statusText = document.getElementById('statusText');
-            const statusDiv = document.getElementById('connectionStatus');
-
-            if (isOnline) {
-                statusIcon.textContent = '🌐';
-                statusText.textContent = 'Online - Ready for unlimited entries';
-                statusDiv.className = 'status-indicator status-online pulse';
+            const statusEl = document.getElementById('connectionStatus');
+            const iconEl = document.getElementById('statusIcon');
+            const textEl = document.getElementById('statusText');
+            
+            if (navigator.onLine) {
+                statusEl.className = 'status-indicator status-online pulse';
+                iconEl.textContent = '🌐';
+                textEl.textContent = 'Online - Ready for unlimited entries';
+                isOnline = true;
             } else {
-                statusIcon.textContent = '📱';
-                statusText.textContent = 'Offline Mode - Data saved locally';
-                statusDiv.className = 'status-indicator status-offline pulse';
+                statusEl.className = 'status-indicator status-offline pulse';
+                iconEl.textContent = '📡';
+                textEl.textContent = 'Offline - Data saved locally';
+                isOnline = false;
             }
         }
-
-        window.addEventListener('online', () => {
-            isOnline = true;
-            updateConnectionStatus();
-        });
-
-        window.addEventListener('offline', () => {
-            isOnline = false;
-            updateConnectionStatus();
-        });
-
-        // Data Management Functions
+        
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        // Data Management
+        function saveData() {
+            try {
+                const dataToSave = {
+                    attendanceData: attendanceData,
+                    employeeName: document.getElementById('employeeName').value,
+                    employeeId: document.getElementById('employeeId').value,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('attendanceSystemData', JSON.stringify(dataToSave));
+                console.log('Data saved successfully');
+            } catch (e) {
+                console.error('Error saving data:', e);
+                showMessage('Error saving data to local storage', 'error');
+            }
+        }
+        
         function loadData() {
             try {
-                const savedAttendance = localStorage.getItem('unlimitedAttendanceData');
-                if (savedAttendance) {
-                    attendanceData = JSON.parse(savedAttendance);
-                }
-
-                const holidays = localStorage.getItem('savedHolidays');
-                if (holidays) {
-                    savedHolidays = JSON.parse(holidays);
-                }
-
-                // Load form data
-                const formFields = ['employeeName', 'employeeId', 'checkInLocation', 'checkOutLocation'];
-                formFields.forEach(field => {
-                    const saved = localStorage.getItem(field);
-                    if (saved) {
-                        document.getElementById(field).value = saved;
+                const savedData = localStorage.getItem('attendanceSystemData');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    attendanceData = parsedData.attendanceData || [];
+                    
+                    if (parsedData.employeeName) {
+                        document.getElementById('employeeName').value = parsedData.employeeName;
                     }
-                });
-
-                console.log(`Loaded ${attendanceData.length} attendance records`);
-            } catch (error) {
-                console.error('Error loading data:', error);
+                    if (parsedData.employeeId) {
+                        document.getElementById('employeeId').value = parsedData.employeeId;
+                    }
+                }
+                console.log('Data loaded successfully');
+            } catch (e) {
+                console.error('Error loading data:', e);
+                attendanceData = [];
                 showMessage('Error loading saved data', 'error');
             }
         }
-
-        function saveData() {
-            try {
-                localStorage.setItem('unlimitedAttendanceData', JSON.stringify(attendanceData));
-                localStorage.setItem('savedHolidays', JSON.stringify(savedHolidays));
-
-                // Save form data
-                const formFields = ['employeeName', 'employeeId', 'checkInLocation', 'checkOutLocation'];
-                formFields.forEach(field => {
-                    localStorage.setItem(field, document.getElementById(field).value);
-                });
-
-                // Also save to IndexedDB for extra persistence
-                saveToIndexedDB();
-            } catch (error) {
-                console.error('Error saving data:', error);
-                showMessage('Error saving data', 'error');
-            }
-        }
-
-        function saveToIndexedDB() {
-            const request = indexedDB.open('UnlimitedAttendanceDB', 1);
-
-            request.onupgradeneeded = function(event) {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains('attendance')) {
-                    db.createObjectStore('attendance', { keyPath: 'id' });
-                }
-            };
-
-            request.onsuccess = function(event) {
-                const db = event.target.result;
-                const transaction = db.transaction(['attendance'], 'readwrite');
-                const store = transaction.objectStore('attendance');
-                store.put({
-                    id: 'unlimitedData',
-                    attendanceData: attendanceData,
-                    holidays: savedHolidays,
-                    lastUpdated: new Date().toISOString()
-                });
-            };
-        }
-
-        // Core Attendance Functions
+        
+        // Attendance Functions
         function checkIn() {
-            const employeeName = document.getElementById('employeeName').value.trim();
-            const employeeId = document.getElementById('employeeId').value.trim();
+            const name = document.getElementById('employeeName').value.trim();
+            const empId = document.getElementById('employeeId').value.trim();
             const location = document.getElementById('checkInLocation').value.trim();
-
-            if (!employeeName || !employeeId) {
-                showMessage('Please enter employee name and ID first', 'error');
+            const description = document.getElementById('workDescription').value.trim();
+            
+            if (!name || !empId) {
+                showMessage('Please enter employee name and ID before checking in', 'error');
                 return;
             }
-
-            if (!location) {
-                showMessage('Please enter check-in location', 'error');
-                return;
-            }
-
-            const now = new Date();
-            const record = {
-                id: now.getTime() + Math.random(),
-                timestamp: now.toISOString(),
-                date: now.toDateString(),
-                time: now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
-                type: 'CHECK_IN',
-                location: location,
-                employeeName: employeeName,
-                employeeId: employeeId,
-                isHoliday: false,
-                isOnline: isOnline
-            };
-
-            attendanceData.push(record);
-            saveData();
-            showMessage(`Check-in successful! Time: ${record.time} | Location: ${location}`, 'success');
-            updateDisplay();
-        }
-
-        function checkOut() {
-            const employeeName = document.getElementById('employeeName').value.trim();
-            const employeeId = document.getElementById('employeeId').value.trim();
-            const location = document.getElementById('checkOutLocation').value.trim();
-
-            if (!employeeName || !employeeId) {
-                showMessage('Please enter employee name and ID first', 'error');
-                return;
-            }
-
-            if (!location) {
-                showMessage('Please enter check-out location', 'error');
-                return;
-            }
-
-            const now = new Date();
-            const record = {
-                id: now.getTime() + Math.random(),
-                timestamp: now.toISOString(),
-                date: now.toDateString(),
-                time: now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
-                type: 'CHECK_OUT',
-                location: location,
-                employeeName: employeeName,
-                employeeId: employeeId,
-                isHoliday: false,
-                isOnline: isOnline
-            };
-
-            attendanceData.push(record);
-            saveData();
-            showMessage(`Check-out successful! Time: ${record.time} | Location: ${location}`, 'success');
-            updateDisplay();
-        }
-
-        function markAsHoliday() {
-            const employeeName = document.getElementById('employeeName').value.trim();
-            const employeeId = document.getElementById('employeeId').value.trim();
-
-            if (!employeeName || !employeeId) {
-                showMessage('Please enter employee name and ID first', 'error');
-                return;
-            }
-
+            
             const now = new Date();
             const today = now.toISOString().split('T')[0];
-
-            const record = {
-                id: now.getTime() + Math.random(),
-                timestamp: now.toISOString(),
-                date: now.toDateString(),
-                time: now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }),
-                type: 'HOLIDAY',
-                location: 'Holiday',
-                employeeName: employeeName,
-                employeeId: employeeId,
-                isHoliday: true,
-                isOnline: isOnline
+            const time = now.toLocaleTimeString('en-US', { 
+                hour12: false,
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            
+            const newRecord = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                date: today,
+                checkInTime: time,
+                checkInLocation: location || 'Not specified',
+                checkOutTime: '',
+                checkOutLocation: '',
+                totalHours: '',
+                workDescription: description || '',
+                holidayEvent: '',
+                employeeName: name,
+                employeeId: empId,
+                type: 'checkin'
             };
-
-            attendanceData.push(record);
-            if (!savedHolidays.includes(today)) {
-                savedHolidays.push(today);
-            }
+            
+            attendanceData.unshift(newRecord);
             saveData();
-            showMessage(`Holiday marked successfully! Enjoy your day off!`, 'success');
             updateDisplay();
+            showMessage(`Check-in recorded at ${now.toLocaleTimeString('en-US', { hour12: true })}`, 'success');
         }
-
-        function deleteRecord(id) {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h3>Delete Record</h3>
-                    <p>Are you sure you want to delete this attendance record?</p>
-                    <br>
-                    <button class="btn btn-delete" onclick="confirmDelete('${id}', this.parentElement.parentElement)">
-                        Yes, Delete
-                    </button>
-                    <button class="btn" onclick="this.parentElement.parentElement.remove()" style="background: #6c757d; color: white; margin-left: 10px;">
-                        Cancel
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function confirmDelete(id, modal) {
-            const index = attendanceData.findIndex(record => record.id == id);
-            if (index !== -1) {
-                const record = attendanceData[index];
-                if (record.isHoliday) {
-                    const holidayDate = new Date(record.timestamp).toISOString().split('T')[0];
-                    savedHolidays = savedHolidays.filter(h => h !== holidayDate);
-                }
-                attendanceData.splice(index, 1);
-                saveData();
-                updateDisplay();
-                showMessage('Record deleted successfully', 'success');
-            }
-            modal.remove();
-        }
-
-        // Display and Statistics
-        function updateDisplay() {
-            const tableBody = document.getElementById('attendanceTableBody');
-            const noDataMessage = document.getElementById('noDataMessage');
-
-            if (attendanceData.length === 0) {
-                tableBody.innerHTML = '';
-                noDataMessage.style.display = 'block';
-                updateStats(0, 0, 0, 0);
+        
+        function checkOut() {
+            const name = document.getElementById('employeeName').value.trim();
+            const empId = document.getElementById('employeeId').value.trim();
+            const location = document.getElementById('checkInLocation').value.trim();
+            const description = document.getElementById('workDescription').value.trim();
+            
+            if (!name || !empId) {
+                showMessage('Please enter employee name and ID before checking out', 'error');
                 return;
             }
-
-            noDataMessage.style.display = 'none';
-
-            // Sort by timestamp (newest first)
-            const sortedData = [...attendanceData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            let totalHours = 0;
-            let completeSessions = 0;
-            let totalHolidays = savedHolidays.length;
-
-            // Calculate sessions and hours
-            for (let i = 0; i < sortedData.length - 1; i++) {
-                const current = sortedData[i];
-                const next = sortedData[i + 1];
-
-                if (current.type === 'CHECK_OUT' && next.type === 'CHECK_IN') {
-                    const checkOutTime = new Date(current.timestamp);
-                    const checkInTime = new Date(next.timestamp);
-                    const diffHours = (checkOutTime - checkInTime) / (1000 * 60 * 60);
-
-                    if (diffHours > 0 && diffHours < 24) {
-                        totalHours += diffHours;
-                        completeSessions++;
+            
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const time = now.toLocaleTimeString('en-US', { 
+                hour12: false,
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            
+            // Check if there's an open check-in for today
+            const openCheckIn = attendanceData.find(record => 
+                record.date === today && 
+                record.type === 'checkin' && 
+                record.employeeName === name &&
+                record.employeeId === empId &&
+                !record.checkOutTime
+            );
+            
+            if (openCheckIn) {
+                // Update existing check-in record
+                openCheckIn.checkOutTime = time;
+                openCheckIn.checkOutLocation = location || 'Not specified';
+                
+                // Update or append to work description
+                if (description) {
+                    if (openCheckIn.workDescription && openCheckIn.workDescription !== description) {
+                        openCheckIn.workDescription += ` | ${description}`;
+                    } else if (!openCheckIn.workDescription) {
+                        openCheckIn.workDescription = description;
                     }
                 }
-            }
-
-            // Generate table rows
-            tableBody.innerHTML = sortedData.map((record, index) => {
-                let duration = 'N/A';
-                let rowClass = '';
-
-                if (record.type === 'CHECK_OUT' && index < sortedData.length - 1) {
-                    const nextRecord = sortedData[index + 1];
-                    if (nextRecord.type === 'CHECK_IN') {
-                        const checkOutTime = new Date(record.timestamp);
-                        const checkInTime = new Date(nextRecord.timestamp);
-                        const diffMinutes = (checkOutTime - checkInTime) / (1000 * 60);
-                        if (diffMinutes > 0 && diffMinutes < 24 * 60) {
-                            const hours = Math.floor(diffMinutes / 60);
-                            const mins = Math.round(diffMinutes % 60);
-                            duration = `${hours}h ${mins}m`;
-                        }
+                
+                // Calculate total hours
+                if (openCheckIn.checkInTime && openCheckIn.checkOutTime) {
+                    const checkInTime = new Date(`${today} ${openCheckIn.checkInTime}`);
+                    const checkOutTime = new Date(`${today} ${openCheckIn.checkOutTime}`);
+                    const diffMs = checkOutTime - checkInTime;
+                    if (diffMs >= 0) {
+                        const diffHours = Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100;
+                        openCheckIn.totalHours = diffHours.toFixed(2);
+                    } else {
+                        openCheckIn.totalHours = '0.00';
                     }
                 }
-
-                if (record.isHoliday) rowClass = 'holiday-row';
-                else if (record.type === 'CHECK_IN') rowClass = 'checkin-row';
-                else if (record.type === 'CHECK_OUT') rowClass = 'checkout-row';
-
-                const typeIcon = {
-                    'CHECK_IN': '📥',
-                    'CHECK_OUT': '📤',
-                    'HOLIDAY': '🎉'
+                
+                showMessage(`Check-out recorded at ${now.toLocaleTimeString('en-US', { hour12: true })}`, 'success');
+            } else {
+                // Create standalone check-out record
+                const newRecord = {
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                    date: today,
+                    checkInTime: '',
+                    checkInLocation: '',
+                    checkOutTime: time,
+                    checkOutLocation: location || 'Not specified',
+                    totalHours: '',
+                    workDescription: description || '',
+                    holidayEvent: '',
+                    employeeName: name,
+                    employeeId: empId,
+                    type: 'checkout'
                 };
-
-                const connectionIcon = record.isOnline ? '🌐' : '📱';
-
+                
+                attendanceData.unshift(newRecord);
+                showMessage(`Check-out recorded at ${now.toLocaleTimeString('en-US', { hour12: true })}`, 'success');
+            }
+            
+            saveData();
+            updateDisplay();
+        }
+        
+        function markHoliday() {
+            const name = document.getElementById('employeeName').value.trim();
+            const empId = document.getElementById('employeeId').value.trim();
+            const description = document.getElementById('workDescription').value.trim();
+            
+            if (!name || !empId) {
+                showMessage('Please enter employee name and ID before marking holiday', 'error');
+                return;
+            }
+            
+            const holidayName = prompt("Enter holiday/event name:");
+            if (holidayName === null) return; // User cancelled
+            
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            
+            const newRecord = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                date: today,
+                checkInTime: 'Holiday',
+                checkInLocation: 'Holiday',
+                checkOutTime: 'Holiday',
+                checkOutLocation: 'Holiday',
+                totalHours: 'Holiday',
+                workDescription: description || '',
+                holidayEvent: holidayName || 'Holiday',
+                employeeName: name,
+                employeeId: empId,
+                type: 'holiday'
+            };
+            
+            attendanceData.unshift(newRecord);
+            saveData();
+            updateDisplay();
+            showMessage(`Holiday marked successfully: ${holidayName || 'Holiday'}`, 'success');
+        }
+        
+        // Edit Functions
+        function editRecord(recordId) {
+            const record = attendanceData.find(r => r.id === recordId);
+            if (!record) return;
+            
+            editingRecordId = recordId;
+            
+            // Populate edit form
+            document.getElementById('editDate').value = record.date;
+            document.getElementById('editCheckInTime').value = record.checkInTime === 'Holiday' ? '' : record.checkInTime;
+            document.getElementById('editCheckInLocation').value = record.checkInLocation === 'Holiday' ? '' : record.checkInLocation;
+            document.getElementById('editCheckOutTime').value = record.checkOutTime === 'Holiday' ? '' : record.checkOutTime;
+            document.getElementById('editCheckOutLocation').value = record.checkOutLocation === 'Holiday' ? '' : record.checkOutLocation;
+            document.getElementById('editWorkDescription').value = record.workDescription || '';
+            document.getElementById('editHoliday').value = record.holidayEvent || '';
+            document.getElementById('editEmployeeName').value = record.employeeName || '';
+            document.getElementById('editEmployeeId').value = record.employeeId || '';
+            
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        
+        function saveEdit() {
+            if (!editingRecordId) return;
+            
+            const record = attendanceData.find(r => r.id === editingRecordId);
+            if (!record) return;
+            
+            // Get form values
+            const newDate = document.getElementById('editDate').value;
+            const newCheckInTime = document.getElementById('editCheckInTime').value;
+            const newCheckOutTime = document.getElementById('editCheckOutTime').value;
+            const newHoliday = document.getElementById('editHoliday').value;
+            
+            // Update record with new values
+            record.date = newDate;
+            record.checkInTime = newCheckInTime || (newHoliday ? 'Holiday' : '');
+            record.checkInLocation = document.getElementById('editCheckInLocation').value || (newHoliday ? 'Holiday' : 'Not specified');
+            record.checkOutTime = newCheckOutTime || (newHoliday ? 'Holiday' : '');
+            record.checkOutLocation = document.getElementById('editCheckOutLocation').value || (newHoliday ? 'Holiday' : 'Not specified');
+            record.workDescription = document.getElementById('editWorkDescription').value || '';
+            record.holidayEvent = newHoliday || '';
+            record.employeeName = document.getElementById('editEmployeeName').value || 'Not specified';
+            record.employeeId = document.getElementById('editEmployeeId').value || 'Not specified';
+            
+            // Recalculate total hours if both times are provided
+            if (record.checkInTime !== 'Holiday' && record.checkOutTime !== 'Holiday' && 
+                record.checkInTime && record.checkOutTime) {
+                const checkInTime = new Date(`${record.date} ${record.checkInTime}`);
+                const checkOutTime = new Date(`${record.date} ${record.checkOutTime}`);
+                const diffMs = checkOutTime - checkInTime;
+                if (diffMs >= 0) {
+                    const diffHours = Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100;
+                    record.totalHours = diffHours.toFixed(2);
+                } else {
+                    record.totalHours = '0.00';
+                }
+            } else if (record.holidayEvent || newHoliday) {
+                record.totalHours = 'Holiday';
+                record.type = 'holiday';
+            }
+            
+            closeEdit();
+            saveData();
+            updateDisplay();
+            showMessage('Record updated successfully!', 'success');
+        }
+        
+        // Delete Functions
+        function deleteRecord(recordId) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                attendanceData = attendanceData.filter(record => record.id !== recordId);
+                saveData();
+                updateDisplay();
+                showMessage('Record deleted successfully!', 'success');
+            }
+        }
+        
+        function deleteAllData() {
+            if (confirm('Are you sure you want to delete ALL data? This action cannot be undone.')) {
+                attendanceData = [];
+                localStorage.removeItem('attendanceSystemData');
+                document.getElementById('employeeName').value = '';
+                document.getElementById('employeeId').value = '';
+                document.getElementById('workDescription').value = '';
+                updateDisplay();
+                showMessage('All data cleared successfully!', 'success');
+            }
+        }
+        
+        // Display Functions
+        function updateDisplay() {
+            updateAttendanceTable();
+            updateStats();
+        }
+        
+        function updateAttendanceTable() {
+            const tbody = document.getElementById('attendanceTableBody');
+            const noDataMsg = document.getElementById('noDataMessage');
+            
+            if (attendanceData.length === 0) {
+                tbody.innerHTML = '';
+                noDataMsg.style.display = 'block';
+                return;
+            }
+            
+            noDataMsg.style.display = 'none';
+            
+            // Sort data by date (newest first)
+            const sortedData = [...attendanceData].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            tbody.innerHTML = sortedData.map(record => {
+                const rowClass = record.type === 'holiday' || record.holidayEvent ? 'holiday-row' : '';
+                
+                // Enhanced description display with click functionality
+                let descriptionHtml = '-';
+                if (record.workDescription && record.workDescription.trim()) {
+                    const isLong = record.workDescription.length > 100;
+                    const previewText = isLong ? record.workDescription.substring(0, 97) + '...' : record.workDescription;
+                    
+                    descriptionHtml = `
+                        <div class="description-preview ${isLong ? 'clickable' : ''}" 
+                             onclick="toggleDescription(this, '${record.id}')" 
+                             title="${record.workDescription}">
+                            ${previewText}
+                        </div>
+                    `;
+                }
+                
                 return `
                     <tr class="${rowClass}">
-                        <td>${new Date(record.timestamp).toLocaleString()}</td>
-                        <td>${typeIcon[record.type]} ${record.type.replace('_', ' ')}</td>
-                        <td>${record.location}</td>
-                        <td>${record.employeeName} (${record.employeeId})</td>
-                        <td>${duration}</td>
-                        <td>${record.isHoliday ? '🎉 Yes' : '❌ No'}</td>
+                        <td>${formatDate(record.date)}</td>
+                        <td>${record.checkInTime || '-'}</td>
+                        <td>${record.checkInLocation || '-'}</td>
+                        <td>${record.checkOutTime || '-'}</td>
+                        <td>${record.checkOutLocation || '-'}</td>
+                        <td>${record.totalHours ? (record.totalHours === 'Holiday' ? 'Holiday' : record.totalHours + 'h') : '-'}</td>
+                        <td class="description-cell">
+                            ${descriptionHtml}
+                        </td>
+                        <td>${record.holidayEvent || '-'}</td>
+                        <td>${record.employeeName || '-'}<br><small>${record.employeeId || '-'}</small></td>
                         <td>
-                            <button class="btn btn-delete" onclick="deleteRecord('${record.id}')">
-                                🗑️ Delete
-                            </button>
+                            <button class="btn-edit" onclick="editRecord('${record.id}')" title="Edit Record">Edit</button>
+                            <button class="btn-delete" onclick="deleteRecord('${record.id}')" title="Delete Record">Delete</button>
                         </td>
                     </tr>
                 `;
             }).join('');
-
-            updateStats(attendanceData.length, completeSessions, totalHours, totalHolidays);
         }
-
-        function updateStats(entries, sessions, hours, holidays) {
-            document.getElementById('totalEntries').textContent = entries;
-            document.getElementById('completeSessions').textContent = sessions;
-            document.getElementById('totalHours').textContent = hours.toFixed(1);
-            document.getElementById('totalHolidays').textContent = holidays;
+        
+        function updateStats() {
+            const workingDays = new Set(
+                attendanceData
+                    .filter(record => record.type !== 'holiday' && record.checkInTime && record.checkInTime !== 'Holiday')
+                    .map(record => record.date)
+            ).size;
+            
+            const totalHours = attendanceData.reduce((sum, record) => {
+                const hours = parseFloat(record.totalHours);
+                return sum + (isNaN(hours) ? 0 : hours);
+            }, 0);
+            
+            const holidayCount = attendanceData.filter(record => 
+                record.type === 'holiday' || record.holidayEvent
+            ).length;
+            
+            const totalEntries = attendanceData.length;
+            
+            document.getElementById('totalDays').textContent = workingDays;
+            document.getElementById('totalHours').textContent = Math.round(totalHours);
+            document.getElementById('holidayCount').textContent = holidayCount;
+            document.getElementById('totalEntries').textContent = totalEntries;
         }
-
+        
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString('en-US', { 
+                weekday: 'short',
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
         function showMessage(message, type) {
             const messageDiv = document.getElementById('statusMessage');
             messageDiv.textContent = message;
             messageDiv.className = `status-message ${type}`;
+            messageDiv.style.display = 'block';
             
-            // Auto-hide after 5 seconds
             setTimeout(() => {
-                messageDiv.textContent = '';
-                messageDiv.className = '';
+                messageDiv.style.display = 'none';
             }, 5000);
         }
-
-        // Export Functions
+        
+        // Download Functions
         function downloadCSVReport() {
-            if (attendanceData.length === 0) {
-                showMessage('No data available for export', 'error');
-                return;
-            }
-
-            const headers = [
-                'Timestamp', 'Date', 'Time', 'Type', 'Location', 
-                'Employee Name', 'Employee ID', 'Holiday', 'Connection'
-            ];
-
-            const csvData = attendanceData.map(record => [
-                record.timestamp,
-                new Date(record.timestamp).toLocaleDateString(),
-                record.time,
-                record.type,
-                record.location,
-                record.employeeName,
-                record.employeeId,
-                record.isHoliday ? 'Yes' : 'No',
-                record.isOnline ? 'Online' : 'Offline'
-            ]);
-
-            const csvContent = [
-                headers.join(','),
-                ...csvData.map(row => row.map(field => `"${field}"`).join(','))
-            ].join('\n');
-
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `attendance_report_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-
-            showMessage('CSV report downloaded successfully!', 'success');
-        }
-
-        function downloadPDFReport() {
-            if (attendanceData.length === 0) {
-                showMessage('No data available for export', 'error');
-                return;
-            }
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Header
-            doc.setFontSize(18);
-            doc.text('Unlimited Attendance System Report', 14, 20);
-            
-            doc.setFontSize(12);
-            doc.text(`Employee: ${document.getElementById('employeeName').value || 'N/A'}`, 14, 35);
-            doc.text(`Employee ID: ${document.getElementById('employeeId').value || 'N/A'}`, 14, 45);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 55);
-            doc.text(`Total Records: ${attendanceData.length}`, 14, 65);
-
-            // Table data
-            const tableHeaders = ['Date', 'Time', 'Type', 'Location', 'Holiday'];
-            const tableData = attendanceData.map(record => [
-                new Date(record.timestamp).toLocaleDateString(),
-                record.time,
-                record.type,
-                record.location.length > 20 ? record.location.substring(0, 20) + '...' : record.location,
-                record.isHoliday ? 'Yes' : 'No'
-            ]);
-
-            doc.autoTable({
-                startY: 75,
-                head: [tableHeaders],
-                body: tableData,
-                theme: 'striped',
-                headStyles: { fillColor: [102, 126, 234] },
-                styles: { fontSize: 10 },
-                margin: { top: 75 }
-            });
-
-            doc.save(`attendance_report_${new Date().toISOString().split('T')[0]}.pdf`);
-            showMessage('PDF report downloaded successfully!', 'success');
-        }
-
-        function deleteAllData() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h3>⚠️ Delete All Data</h3>
-                    <p>This will permanently delete all attendance records, holidays, and saved information. This action cannot be undone.</p>
-                    <p><strong>Are you absolutely sure?</strong></p>
-                    <br>
-                    <button class="btn btn-delete" onclick="confirmDeleteAll(this.parentElement.parentElement)">
-                        🗑️ Yes, Delete Everything
-                    </button>
-                    <button class="btn" onclick="this.parentElement.parentElement.remove()" style="background: #6c757d; color: white; margin-left: 10px;">
-                        ❌ Cancel
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function confirmDeleteAll(modal) {
             try {
-                // Clear all localStorage
-                const keysToDelete = [
-                    'unlimitedAttendanceData', 
-                    'savedHolidays', 
-                    'employeeName', 
-                    'employeeId', 
-                    'checkInLocation', 
-                    'checkOutLocation'
-                ];
+                if (attendanceData.length === 0) {
+                    showMessage('No data to export', 'error');
+                    return;
+                }
                 
-                keysToDelete.forEach(key => localStorage.removeItem(key));
-
-                // Clear IndexedDB
-                indexedDB.deleteDatabase('UnlimitedAttendanceDB');
-
-                // Reset application state
-                attendanceData = [];
-                savedHolidays = [];
+                let csvContent = 'Date,Check In Time,Check In Location,Check Out Time,Check Out Location,Total Hours,Work Description/Notes,Holiday/Event,Employee Name,Employee ID,Type\n';
                 
-                // Clear form fields
-                document.getElementById('employeeName').value = '';
-                document.getElementById('employeeId').value = '';
-                document.getElementById('checkInLocation').value = '';
-                document.getElementById('checkOutLocation').value = '';
-
-                updateDisplay();
-                modal.remove();
-                showMessage('All data deleted successfully!', 'success');
+                const sortedData = [...attendanceData].sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                sortedData.forEach(record => {
+                    // Properly escape CSV fields
+                    const escapeCSV = (field) => {
+                        if (field === null || field === undefined) return '';
+                        const str = String(field);
+                        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                            return '"' + str.replace(/"/g, '""') + '"';
+                        }
+                        return str;
+                    };
+                    
+                    csvContent += [
+                        escapeCSV(record.date),
+                        escapeCSV(record.checkInTime),
+                        escapeCSV(record.checkInLocation),
+                        escapeCSV(record.checkOutTime),
+                        escapeCSV(record.checkOutLocation),
+                        escapeCSV(record.totalHours),
+                        escapeCSV(record.workDescription),
+                        escapeCSV(record.holidayEvent),
+                        escapeCSV(record.employeeName),
+                        escapeCSV(record.employeeId),
+                        escapeCSV(record.type || 'attendance')
+                    ].join(',') + '\n';
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `attendance-report-${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(url); // Clean up
+                
+                showMessage('CSV report downloaded successfully!', 'success');
+                
             } catch (error) {
-                console.error('Error deleting data:', error);
-                showMessage('Error deleting data', 'error');
+                console.error('Error downloading CSV:', error);
+                showMessage('Error downloading CSV report', 'error');
             }
         }
-
-        // Auto-save data every 30 seconds
-        setInterval(() => {
-            if (attendanceData.length > 0) {
-                saveData();
-                console.log('Auto-saved data at', new Date().toLocaleTimeString());
+        
+        function downloadPDFReport() {
+            try {
+                if (attendanceData.length === 0) {
+                    showMessage('No data to export', 'error');
+                    return;
+                }
+                
+                const content = generateReportContent();
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `attendance-report-${new Date().toISOString().split('T')[0]}.txt`);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(url); // Clean up
+                
+                showMessage('Report downloaded as text file successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error downloading report:', error);
+                showMessage('Error downloading report', 'error');
             }
-        }, 30000);
-
-        // Save data before page unload
-        window.addEventListener('beforeunload', () => {
+        }
+        
+        function generateReportContent() {
+            let content = 'ATTENDANCE REPORT\n';
+            content += '==================\n\n';
+            content += `Generated on: ${new Date().toLocaleDateString()}\n`;
+            content += `Generated at: ${new Date().toLocaleTimeString()}\n\n`;
+            
+            // Stats
+            const workingDays = new Set(
+                attendanceData
+                    .filter(record => record.type !== 'holiday' && record.checkInTime && record.checkInTime !== 'Holiday')
+                    .map(record => record.date)
+            ).size;
+            
+            const totalHours = attendanceData.reduce((sum, record) => {
+                const hours = parseFloat(record.totalHours);
+                return sum + (isNaN(hours) ? 0 : hours);
+            }, 0);
+            
+            content += `Total Working Days: ${workingDays}\n`;
+            content += `Total Hours: ${Math.round(totalHours)}h\n`;
+            content += `Total Entries: ${attendanceData.length}\n\n`;
+            
+            content += 'DETAILED RECORDS:\n';
+            content += '-'.repeat(100) + '\n\n';
+            
+            const sortedData = [...attendanceData].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedData.forEach((record, index) => {
+                content += `Entry ${index + 1}:\n`;
+                content += `  Date: ${formatDate(record.date)}\n`;
+                content += `  Check In: ${record.checkInTime || '-'}\n`;
+                content += `  Check In Location: ${record.checkInLocation || '-'}\n`;
+                content += `  Check Out: ${record.checkOutTime || '-'}\n`;
+                content += `  Check Out Location: ${record.checkOutLocation || '-'}\n`;
+                content += `  Duration: ${record.totalHours ? (record.totalHours === 'Holiday' ? 'Holiday' : record.totalHours + 'h') : '-'}\n`;
+                content += `  Description: ${record.workDescription || '-'}\n`;
+                content += `  Holiday/Event: ${record.holidayEvent || '-'}\n`;
+                content += `  Employee: ${record.employeeName || '-'} (${record.employeeId || '-'})\n`;
+                content += '\n' + '-'.repeat(50) + '\n\n';
+            });
+            
+            return content;
+        }
+        
+        // Auto-save employee info
+        document.getElementById('employeeName').addEventListener('input', function() {
             saveData();
         });
-
-        // Handle page visibility for better performance
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                saveData();
+        
+        document.getElementById('employeeId').addEventListener('input', function() {
+            saveData();
+        });
+        
+        // Prevent form submission on Enter key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
             }
         });
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'i':
+                    case 'I':
+                        e.preventDefault();
+                        checkIn();
+                        break;
+                    case 'o':
+                    case 'O':
+                        e.preventDefault();
+                        checkOut();
+                        break;
+                    case 'h':
+                    case 'H':
+                        e.preventDefault();
+                        markHoliday();
+                        break;
+                    case 's':
+                    case 'S':
+                        e.preventDefault();
+                        downloadCSVReport();
+                        break;
+                }
+            }
+        });
+        
+        // Show keyboard shortcuts info
+        function showKeyboardShortcuts() {
+            showMessage('Keyboard shortcuts: Ctrl+I (Check In), Ctrl+O (Check Out), Ctrl+H (Holiday), Ctrl+S (Download)', 'success');
+        }
+        
+        // Add visibility change handler for PWA
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // App became visible, update time and check connection
+                updateCurrentTime();
+                updateConnectionStatus();
+            }
+        });
+        
+        // Handle page refresh/close
+        window.addEventListener('beforeunload', function(e) {
+            // Save any pending changes
+            saveData();
+        });
+        
+        // Initialize app when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
     </script>
 </body>
 </html>
